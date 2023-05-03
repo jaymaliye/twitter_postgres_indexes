@@ -1,23 +1,26 @@
 SELECT 
-    '#' || t.hashtag as tag, 
+    '#' || x.hashtag AS tag, 
     count(*) as count
 FROM (
     SELECT DISTINCT
-        data->>'id' as id_tweets,
-        jsonb_array_elements(data->'entities'->'hashtags')->>'text' as hashtag
+        data->>'id' AS id_tweets,
+        jsonb_array_elements(data->'entities'->'hashtags')->>'text' AS hashtag
     FROM 
         tweets_jsonb
     WHERE 
         data->'entities'->'hashtags'@@'$[*].text == "coronavirus"'
     UNION
     SELECT DISTINCT
-        data->>'id' as id_tweets,
-        jsonb_array_elements(data->'extended_tweet'->'entities'->'hashtags')->>'text' as hashtag
+        data->>'id' AS id_tweets,
+        jsonb_array_elements(data->'extended_tweet'->'entities'->'hashtags')->>'text' AS hashtag
     FROM 
         tweets_jsonb
     WHERE 
         data->'extended_tweet'->'entities'->'hashtags'@@'$[*].text == "coronavirus"'
-) t
-GROUP BY t.hashtag
-ORDER BY count DESC, t.hashtag
-LIMIT 1000;
+) x
+GROUP BY 
+    x.hashtag
+ORDER BY 
+    count DESC, x.hashtag
+LIMIT 
+    1000;

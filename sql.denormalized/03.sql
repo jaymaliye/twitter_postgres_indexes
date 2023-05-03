@@ -1,21 +1,23 @@
 SELECT 
-    t.lang as lang, 
-    count(*) as count
+    x.lang AS lang, 
+    count(*)
 FROM (
-    SELECT DISTINCT data->>'id' as id_tweets, data->>'lang' as lang
+    SELECT DISTINCT 
+        data->>'id' AS id_tweets, data->>'lang' AS lang
     FROM 
         tweets_jsonb
     WHERE 
-        data->'entities'->'hashtags'@@'$[*].text == "coronavirus"'
+        data->'entities'->'hashtags' @@ '$[*].text == "coronavirus"'
     UNION
     SELECT DISTINCT 
-        data->>'id' as id_tweets, data->>'lang' as lang
+        data->>'id' AS id_tweets, data->>'lang' AS lang
     FROM 
         tweets_jsonb
     WHERE 
-        data->'extended_tweet'->'entities'->'hashtags'@@'$[*].text == "coronavirus"'
-) t
+        data->'extended_tweet'->'entities'->'hashtags' @@ '$[*].text == "coronavirus"'
+) x
 GROUP BY 
-    t.lang
+    x.lang
 ORDER BY 
-    count DESC, t.lang;
+    count DESC, 
+    x.lang;
